@@ -39,6 +39,11 @@ const auctionSchema = new mongoose.Schema({
     min: 0,
     default: null
   },
+  bidIncrement: {
+    type: Number,
+    min: 0.01,
+    default: 1.00
+  },
   auctionType: {
     type: String,
     enum: ['pure_sale', 'reserve_price'],

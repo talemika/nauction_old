@@ -56,9 +56,10 @@ const AuctionDetail = () => {
 
     try {
       const amount = parseFloat(bidAmount);
+      const minimumBid = auction.currentPrice + (auction.bidIncrement || 1.00);
       
-      if (amount <= auction.currentPrice) {
-        setError(`Bid must be higher than current price of $${auction.currentPrice}`);
+      if (amount < minimumBid) {
+        setError(`Bid must be at least ${formatPrice(minimumBid)} (current price + ${formatPrice(auction.bidIncrement || 1.00)} increment)`);
         setBidLoading(false);
         return;
       }
@@ -279,9 +280,16 @@ const AuctionDetail = () => {
                 </div>
               </div>
 
+              <Separator />
+
               <div className="text-center space-y-1">
                 <div className="text-sm text-muted-foreground">Starting Price</div>
                 <div className="text-lg">{formatPrice(auction.startingPrice)}</div>
+              </div>
+
+              <div className="text-center space-y-1">
+                <div className="text-sm text-muted-foreground">Bid Increment</div>
+                <div className="text-lg">{formatPrice(auction.bidIncrement || 1.00)}</div>
               </div>
             </CardContent>
           </Card>
@@ -315,12 +323,15 @@ const AuctionDetail = () => {
                       id="bidAmount"
                       type="number"
                       step="0.01"
-                      min={auction.currentPrice + 0.01}
-                      placeholder={`Minimum: $${(auction.currentPrice + 0.01).toFixed(2)}`}
+                      min={auction.currentPrice + (auction.bidIncrement || 1.00)}
+                      placeholder={`Minimum: $${(auction.currentPrice + (auction.bidIncrement || 1.00)).toFixed(2)}`}
                       value={bidAmount}
                       onChange={(e) => setBidAmount(e.target.value)}
                       required
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Bid increment: {formatPrice(auction.bidIncrement || 1.00)}
+                    </p>
                   </div>
 
                   <Button type="submit" className="w-full" disabled={bidLoading}>

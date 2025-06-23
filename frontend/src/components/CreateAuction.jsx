@@ -18,6 +18,7 @@ const CreateAuction = () => {
     buyItNowPrice: '',
     reservePrice: '',
     estimatedRetailValue: '',
+    bidIncrement: '1.00',
     auctionType: 'pure_sale',
     currency: 'NGN', // Default to Naira
     category: '',
@@ -169,6 +170,7 @@ const CreateAuction = () => {
         buyItNowPrice: formData.buyItNowPrice ? parseFloat(formData.buyItNowPrice) : null,
         reservePrice: formData.reservePrice ? parseFloat(formData.reservePrice) : null,
         estimatedRetailValue: formData.estimatedRetailValue ? parseFloat(formData.estimatedRetailValue) : null,
+        bidIncrement: parseFloat(formData.bidIncrement),
         auctionType: formData.auctionType,
         currency: formData.currency,
         category: formData.category,
@@ -382,6 +384,27 @@ const CreateAuction = () => {
                 />
                 <p className="text-sm text-muted-foreground">
                   Estimated market value to help bidders understand the item's worth
+                </p>
+              </div>
+
+              {/* Bid Increment */}
+              <div className="space-y-2">
+                <Label htmlFor="bidIncrement">
+                  Bid Increment ({formData.currency === 'NGN' ? '₦' : '$'}) *
+                </Label>
+                <Input
+                  id="bidIncrement"
+                  name="bidIncrement"
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  placeholder="1.00"
+                  value={formData.bidIncrement}
+                  onChange={handleChange}
+                  required
+                />
+                <p className="text-sm text-muted-foreground">
+                  Minimum amount by which bids must increase
                 </p>
               </div>
             </div>
