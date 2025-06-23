@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import Home from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
+import AuthCallback from './components/AuthCallback';
 import AuctionDetail from './components/AuctionDetail';
 import CreateAuction from './components/CreateAuction';
 import MyAuctions from './components/MyAuctions';
@@ -28,6 +29,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="/auction/:id" element={<AuctionDetail />} />
                 <Route path="/create-auction" element={<CreateAuction />} />
                 <Route path="/my-auctions" element={<MyAuctions />} />

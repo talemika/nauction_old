@@ -25,6 +25,10 @@ const bidSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isAutoBid: {
+    type: Boolean,
+    default: false
+  },
   timestamp: {
     type: Date,
     default: Date.now

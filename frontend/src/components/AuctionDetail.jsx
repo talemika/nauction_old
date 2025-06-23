@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useCurrency } from '../hooks/useCurrency';
 import { auctionsAPI, bidsAPI } from '../lib/api';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -10,6 +11,7 @@ import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
 import { Separator } from './ui/separator';
 import { Clock, DollarSign, User, Gavel, Loader2 } from 'lucide-react';
+import MaxBid from './MaxBid';
 
 const AuctionDetail = () => {
   const { id } = useParams();
@@ -236,9 +238,16 @@ const AuctionDetail = () => {
                           <User className="h-4 w-4" />
                           <span className="font-medium">{bid.bidder?.username}</span>
                         </div>
-                        {index === 0 && (
-                          <Badge variant="default">Highest Bid</Badge>
-                        )}
+                        <div className="flex items-center space-x-2">
+                          {index === 0 && (
+                            <Badge variant="default">Highest Bid</Badge>
+                          )}
+                          {bid.isAutoBid && (
+                            <Badge variant="secondary" className="text-xs">
+                              Auto-Bid
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-center space-x-4">
                         <span className="font-semibold text-green-600">
@@ -361,6 +370,9 @@ const AuctionDetail = () => {
               </CardContent>
             </Card>
           )}
+
+          {/* Auto-Bidding Component */}
+          <MaxBid auction={auction} />
         </div>
       </div>
     </div>

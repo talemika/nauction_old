@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const session = require('express-session');
+const passport = require('./config/passport');
 const { createDefaultAdmin } = require('./utils/createAdmin');
 require('dotenv').config();
 
@@ -9,8 +11,26 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
+
+// Session configuration for OAuth
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // MongoDB connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/auction-app';
@@ -28,6 +48,7 @@ mongoose.connect(MONGODB_URI, {
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
+app.use('/auth', require('./routes/oauth')); // Google OAuth routes
 app.use('/api/auctions', require('./routes/auctions'));
 app.use('/api/bids', require('./routes/bids'));
 app.use('/api/upload', require('./routes/upload'));
@@ -39,7 +60,9 @@ app.use('/api/seller-agreements', require('./routes/sellerAgreements'));
 // Add Buy It Now functionality to auctions route
 const auctionsRouter = require('./routes/auctions');
 const buyItNowRouter = require('./routes/buyItNow');
+const maxBidRouter = require('./routes/maxBid');
 app.use('/api/auctions', buyItNowRouter);
+app.use('/api/auctions', maxBidRouter);
 
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

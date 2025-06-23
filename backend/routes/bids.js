@@ -68,6 +68,16 @@ router.post('/', authenticateToken, async (req, res) => {
     await bid.save();
     await bid.populate('bidder', 'username');
 
+    // Trigger auto-bidding after manual bid
+    try {
+      const { processAutoBidding } = require('./maxBid');
+      // Use setTimeout to avoid blocking the response
+      setTimeout(() => processAutoBidding(auctionId), 500);
+    } catch (error) {
+      console.error('Auto-bidding trigger error:', error);
+      // Don't fail the bid if auto-bidding fails
+    }
+
     res.status(201).json({
       message: 'Bid placed successfully',
       bid,
