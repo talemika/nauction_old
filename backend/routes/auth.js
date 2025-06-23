@@ -55,17 +55,38 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // Validation
+    if (!email || !password) {
+      return res.status(400).json({ 
+        message: 'Email and password are required' 
+      });
+    }
+
+    if (!email.includes('@')) {
+      return res.status(400).json({ 
+        message: 'Please provide a valid email address' 
+      });
+    }
+
+    console.log('Login attempt for email:', email);
+
     // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
+      console.log('User not found for email:', email);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
+
+    console.log('User found:', user.email, 'Role:', user.role);
 
     // Check password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
+      console.log('Password mismatch for user:', email);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
+
+    console.log('Login successful for user:', email);
 
     // Generate JWT token
     const token = jwt.sign(
