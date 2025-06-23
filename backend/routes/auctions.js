@@ -121,7 +121,8 @@ router.post('/', requireAdminAuth, async (req, res) => {
       tags: tags || [],
       seller: req.user.userId,
       startTime: auctionStartTime,
-      endTime: auctionEndTime
+      endTime: auctionEndTime,
+      status: 'active' // Set status to active immediately
     });
 
     await auction.save();
