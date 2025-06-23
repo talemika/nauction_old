@@ -15,6 +15,10 @@ app.use(cors({
   origin: [
     'http://localhost:3000',
     'http://localhost:5173',
+    'http://localhost:5179',
+    'http://192.168.121.129:5179',
+    'http://192.168.121.129:3000',
+    'http://192.168.121.129:5173',
     'https://bjhnrhac.manus.space',
     'https://ouqsdgyh.manus.space',
     'https://tvmgvvuw.manus.space',
