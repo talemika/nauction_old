@@ -10,7 +10,6 @@ import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
 import { Separator } from './ui/separator';
 import { Clock, DollarSign, User, Gavel, Loader2 } from 'lucide-react';
-import BalanceAlert from './BalanceAlert';
 
 const AuctionDetail = () => {
   const { id } = useParams();
@@ -24,18 +23,10 @@ const AuctionDetail = () => {
   const [bidLoading, setBidLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [balanceInfo, setBalanceInfo] = useState(null);
-  const [balanceLoading, setBalanceLoading] = useState(false);
 
   useEffect(() => {
     fetchAuctionDetails();
   }, [id]);
-
-  useEffect(() => {
-    if (auction && isAuthenticated) {
-      checkBidEligibility();
-    }
-  }, [auction, isAuthenticated, bidAmount]);
 
   const fetchAuctionDetails = async () => {
     try {
