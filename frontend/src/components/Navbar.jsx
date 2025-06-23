@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from './ui/button';
-import { Gavel, User, Plus, List, TrendingUp, Shield, Info } from 'lucide-react';
+import { Gavel, User, Plus, List, TrendingUp, Shield, Info, Heart } from 'lucide-react';
 import CurrencySelector from './CurrencySelector';
 
 const Navbar = () => {
@@ -48,6 +48,10 @@ const Navbar = () => {
                 <Link to="/my-bids" className="flex items-center space-x-1 text-foreground hover:text-primary transition-colors">
                   <TrendingUp className="h-4 w-4" />
                   <span>My Bids</span>
+                </Link>
+                <Link to="/watchlist" className="flex items-center space-x-1 text-foreground hover:text-primary transition-colors">
+                  <Heart className="h-4 w-4" />
+                  <span>Watchlist</span>
                 </Link>
               </>
             )}

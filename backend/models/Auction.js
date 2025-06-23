@@ -46,7 +46,7 @@ const auctionSchema = new mongoose.Schema({
   },
   auctionType: {
     type: String,
-    enum: ['pure_sale', 'reserve_price'],
+    enum: ['pure_sale', 'reserve_price', 'buy_it_now', 'timed_auction', 'dutch_auction'],
     default: 'pure_sale'
   },
   currency: {

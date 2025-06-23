@@ -57,6 +57,13 @@ export const currencyAPI = {
     api.post('/currency/format', { amount, currency }),
 };
 
+// Max Bid API
+export const maxBidAPI = {
+  setMaxBid: (auctionId, maxAmount) => api.post(`/auctions/${auctionId}/max-bid`, { maxAmount }),
+  getMaxBid: (auctionId) => api.get(`/auctions/${auctionId}/max-bid`),
+  cancelMaxBid: (auctionId) => api.delete(`/auctions/${auctionId}/max-bid`),
+};
+
 // Export the main api instance
 export { api };
 export default api;

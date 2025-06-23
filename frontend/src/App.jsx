@@ -15,6 +15,7 @@ import AdminPanel from './components/AdminPanel';
 import UserProfile from './components/UserProfile';
 import BiddingInfo from './components/BiddingInfo';
 import SellerAgreement from './components/SellerAgreement';
+import Watchlist from './components/Watchlist';
 import './App.css';
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
                 <Route path="/create-auction" element={<CreateAuction />} />
                 <Route path="/my-auctions" element={<MyAuctions />} />
                 <Route path="/my-bids" element={<MyBids />} />
+                <Route path="/watchlist" element={<Watchlist />} />
                 <Route path="/admin" element={<AdminPanel />} />
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/bidding-info" element={<BiddingInfo />} />

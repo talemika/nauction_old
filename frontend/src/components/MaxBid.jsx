@@ -8,7 +8,7 @@ import { Label } from './ui/label';
 import { Alert, AlertDescription } from './ui/alert';
 import { Badge } from './ui/badge';
 import { Loader2, Target, Zap, AlertTriangle } from 'lucide-react';
-import { authAPI } from '../lib/api';
+import { api } from '../lib/api';
 
 const MaxBid = ({ auction }) => {
   const { isAuthenticated, user } = useAuth();
@@ -28,7 +28,7 @@ const MaxBid = ({ auction }) => {
 
   const fetchCurrentMaxBid = async () => {
     try {
-      const response = await authAPI.get(`/auctions/${auction._id}/max-bid`);
+      const response = await api.get(`/auctions/${auction._id}/max-bid`);
       setCurrentMaxBid(response.data.maxBid);
     } catch (error) {
       console.error('Error fetching max bid:', error);
@@ -49,7 +49,7 @@ const MaxBid = ({ auction }) => {
         return;
       }
 
-      const response = await authAPI.post(`/auctions/${auction._id}/max-bid`, {
+      const response = await api.post(`/auctions/${auction._id}/max-bid`, {
         maxAmount: amount
       });
 
@@ -69,7 +69,7 @@ const MaxBid = ({ auction }) => {
     setSuccess('');
 
     try {
-      await authAPI.delete(`/auctions/${auction._id}/max-bid`);
+      await api.delete(`/auctions/${auction._id}/max-bid`);
       setSuccess('Max bid cancelled successfully');
       setCurrentMaxBid(null);
     } catch (err) {

@@ -9,6 +9,7 @@ const SearchComponent = ({ onResults, onLoading }) => {
     minPrice: '',
     maxPrice: '',
     condition: '',
+    auctionType: '',
     sortBy: 'createdAt',
     sortOrder: 'desc'
   });
@@ -46,6 +47,7 @@ const SearchComponent = ({ onResults, onLoading }) => {
       if (filters.minPrice) params.append('minPrice', filters.minPrice);
       if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
       if (filters.condition) params.append('condition', filters.condition);
+      if (filters.auctionType) params.append('auctionType', filters.auctionType);
       params.append('sortBy', filters.sortBy);
       params.append('sortOrder', filters.sortOrder);
       params.append('page', page.toString());
@@ -72,6 +74,7 @@ const SearchComponent = ({ onResults, onLoading }) => {
       minPrice: '',
       maxPrice: '',
       condition: '',
+      auctionType: '',
       sortBy: 'createdAt',
       sortOrder: 'desc'
     });
@@ -131,7 +134,7 @@ const SearchComponent = ({ onResults, onLoading }) => {
 
         {/* Filters Panel */}
         {showFilters && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 p-4 bg-gray-50 rounded-lg">
             {/* Category Filter */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -148,6 +151,25 @@ const SearchComponent = ({ onResults, onLoading }) => {
                     {category}
                   </option>
                 ))}
+              </select>
+            </div>
+
+            {/* Auction Type Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Auction Type
+              </label>
+              <select
+                value={filters.auctionType}
+                onChange={(e) => handleFilterChange('auctionType', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">All Types</option>
+                <option value="pure_sale">Pure Sale</option>
+                <option value="reserve_price">Reserve Price</option>
+                <option value="buy_it_now">Buy It Now</option>
+                <option value="timed_auction">Timed Auction</option>
+                <option value="dutch_auction">Dutch Auction</option>
               </select>
             </div>
 

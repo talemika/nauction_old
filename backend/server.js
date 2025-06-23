@@ -68,6 +68,8 @@ app.use('/api/bids', require('./routes/bids'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/currency', require('./routes/currency'));
 app.use('/api/search', require('./routes/search'));
+app.use('/api/watchlist', require('./routes/watchlist'));
+app.use('/api/max-bid', require('./routes/maxBid'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/seller-agreements', require('./routes/sellerAgreements'));
 

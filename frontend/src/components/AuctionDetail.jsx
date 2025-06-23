@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useCurrency } from '../hooks/useCurrency';
-import { auctionsAPI, bidsAPI } from '../lib/api';
 import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
+import { Badge } from './ui/badge';
 import { Separator } from './ui/separator';
 import { Clock, DollarSign, User, Gavel, Loader2 } from 'lucide-react';
 import MaxBid from './MaxBid';
+import WatchlistButton from './WatchlistButton';
+import { api, bidsAPI } from '../lib/api';
 
 const AuctionDetail = () => {
   const { id } = useParams();
@@ -221,6 +222,68 @@ const AuctionDetail = () => {
             </CardContent>
           </Card>
 
+          {/* Auction Details */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Auction Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Auction Type:</span>
+                    <span className="font-medium capitalize">
+                      {auction.auctionType?.replace('_', ' ') || 'Pure Sale'}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Category:</span>
+                    <span className="font-medium">
+                      {auction.category || 'Uncategorized'}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Condition:</span>
+                    <span className="font-medium capitalize">
+                      {auction.condition || 'Good'}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  {auction.estimatedRetailValue && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Estimated Retail Value:</span>
+                      <span className="font-medium">
+                        {formatPrice(auction.estimatedRetailValue)}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {auction.reservePrice && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Reserve Price:</span>
+                      <span className="font-medium">
+                        {formatPrice(auction.reservePrice)}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {auction.buyItNowPrice && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Buy It Now:</span>
+                      <span className="font-medium text-green-600">
+                        {formatPrice(auction.buyItNowPrice)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Bid History */}
           <Card>
             <CardHeader>
@@ -373,6 +436,9 @@ const AuctionDetail = () => {
 
           {/* Auto-Bidding Component */}
           <MaxBid auction={auction} />
+
+          {/* Watchlist Button */}
+          <WatchlistButton auction={auction} className="w-full" />
         </div>
       </div>
     </div>
