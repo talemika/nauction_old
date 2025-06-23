@@ -13,6 +13,7 @@ import { Clock, DollarSign, User, Gavel, Loader2 } from 'lucide-react';
 import MaxBid from './MaxBid';
 import WatchlistButton from './WatchlistButton';
 import { api, bidsAPI } from '../lib/api';
+import { auctionsAPI } from '../lib/api';
 
 const AuctionDetail = () => {
   const { id } = useParams();
