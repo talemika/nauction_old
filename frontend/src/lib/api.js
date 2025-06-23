@@ -1,9 +1,7 @@
 import axios from 'axios';
 
-// Use deployed backend URL or fallback to localhost for development
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://5000-ikh7t640hxicw0sx0ks08-287ac3c4.manusvm.computer/api'
-  : 'http://localhost:5000/api';
+// Always use deployed backend URL
+const API_BASE_URL = 'https://5000-ikh7t640hxicw0sx0ks08-287ac3c4.manusvm.computer/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

@@ -21,7 +21,8 @@ app.use(cors({
     'https://zdvddujf.manus.space',
     'https://nnlrfrmm.manus.space',
     'https://tztzliag.manus.space',
-    'https://eykpjywi.manus.space'
+    'https://eykpjywi.manus.space',
+    'https://xewomthj.manus.space'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
