@@ -1,7 +1,15 @@
 import axios from 'axios';
 
-// Always use deployed backend URL
-const API_BASE_URL = 'https://5000-ikh7t640hxicw0sx0ks08-287ac3c4.manusvm.computer/api';
+// Determine API base URL based on environment
+const isLocalDevelopment = window.location.hostname === 'localhost' || 
+                          window.location.hostname === '127.0.0.1' ||
+                          window.location.hostname.startsWith('192.168.') ||
+                          window.location.hostname.startsWith('10.') ||
+                          window.location.hostname.match(/^172\.(1[6-9]|2[0-9]|3[01])\./);
+
+const API_BASE_URL = isLocalDevelopment 
+  ? 'http://localhost:5000/api'
+  : 'https://5000-ikh7t640hxicw0sx0ks08-287ac3c4.manusvm.computer/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

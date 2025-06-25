@@ -12,24 +12,24 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'http://localhost:5179',
-    'http://192.168.121.129:5179',
-    'http://192.168.121.129:3000',
-    'http://192.168.121.129:5173',
-    'https://bjhnrhac.manus.space',
-    'https://ouqsdgyh.manus.space',
-    'https://tvmgvvuw.manus.space',
-    'https://zdvddujf.manus.space',
-    'https://nnlrfrmm.manus.space',
-    'https://tztzliag.manus.space',
-    'https://eykpjywi.manus.space',
-    'https://xewomthj.manus.space',
-    'https://bwoyeezy.manus.space',
-    'https://kheyxcvq.manus.space'
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow all localhost origins
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true);
+    }
+    
+    // Allow all local network IPs (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
+    if (origin.match(/^https?:\/\/(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[01])\.)/) ||
+        origin.includes('.manus.space')) {
+      return callback(null, true);
+    }
+    
+    // Reject other origins
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
