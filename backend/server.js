@@ -12,24 +12,12 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // Allow all localhost origins
-    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-      return callback(null, true);
-    }
-    
-    // Allow all local network IPs (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
-    if (origin.match(/^https?:\/\/(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[01])\.)/) ||
-        origin.includes('.manus.space')) {
-      return callback(null, true);
-    }
-    
-    // Reject other origins
-    callback(new Error('Not allowed by CORS'));
-  },
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://localhost:5179',
+    'https://*.manus.space'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -73,17 +61,12 @@ app.use('/api/bids', require('./routes/bids'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/currency', require('./routes/currency'));
 app.use('/api/search', require('./routes/search'));
-app.use('/api/watchlist', require('./routes/watchlist'));
-app.use('/api/max-bid', require('./routes/maxBid'));
 app.use('/api/users', require('./routes/users'));
-app.use('/api/seller-agreements', require('./routes/sellerAgreements'));
 
 // Add Buy It Now functionality to auctions route
 const auctionsRouter = require('./routes/auctions');
 const buyItNowRouter = require('./routes/buyItNow');
-const maxBidRouter = require('./routes/maxBid');
 app.use('/api/auctions', buyItNowRouter);
-app.use('/api/auctions', maxBidRouter);
 
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

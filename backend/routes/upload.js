@@ -74,20 +74,11 @@ router.get('/test', (req, res) => {
 // Upload single file endpoint (admin only)
 router.post('/single', auth, upload.single('file'), (req, res) => {
   try {
-    console.log('=== Upload Request Debug ===');
-    console.log('Headers:', req.headers);
-    console.log('Authorization header:', req.headers.authorization);
-    console.log('User from auth middleware:', req.user);
-    console.log('File:', req.file);
-    console.log('Body:', req.body);
-    
     if (!req.file) {
-      console.log('No file in request');
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
     const fileUrl = `/uploads/${req.file.filename}`;
-    console.log('File uploaded successfully:', fileUrl);
     
     res.json({
       message: 'File uploaded successfully',

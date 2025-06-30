@@ -1,15 +1,9 @@
 import axios from 'axios';
 
-// Determine API base URL based on environment
-const isLocalDevelopment = window.location.hostname === 'localhost' || 
-                          window.location.hostname === '127.0.0.1' ||
-                          window.location.hostname.startsWith('192.168.') ||
-                          window.location.hostname.startsWith('10.') ||
-                          window.location.hostname.match(/^172\.(1[6-9]|2[0-9]|3[01])\./);
-
-const API_BASE_URL = isLocalDevelopment 
-  ? 'http://localhost:5000/api'
-  : 'https://5000-ikh7t640hxicw0sx0ks08-287ac3c4.manusvm.computer/api';
+// Use localhost for development, deployed URL for production
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://5000-ikh7t640hxicw0sx0ks08-287ac3c4.manusvm.computer/api'
+  : 'http://localhost:5000/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -61,13 +55,6 @@ export const currencyAPI = {
     api.post('/currency/convert', { amount, fromCurrency, toCurrency }),
   formatCurrency: (amount, currency) => 
     api.post('/currency/format', { amount, currency }),
-};
-
-// Max Bid API
-export const maxBidAPI = {
-  setMaxBid: (auctionId, maxAmount) => api.post(`/auctions/${auctionId}/max-bid`, { maxAmount }),
-  getMaxBid: (auctionId) => api.get(`/auctions/${auctionId}/max-bid`),
-  cancelMaxBid: (auctionId) => api.delete(`/auctions/${auctionId}/max-bid`),
 };
 
 // Export the main api instance

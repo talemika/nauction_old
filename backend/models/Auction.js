@@ -24,11 +24,6 @@ const auctionSchema = new mongoose.Schema({
       return this.startingPrice;
     }
   },
-  estimatedRetailValue: {
-    type: Number,
-    min: 0,
-    default: null
-  },
   buyItNowPrice: {
     type: Number,
     min: 0,
@@ -38,16 +33,6 @@ const auctionSchema = new mongoose.Schema({
     type: Number,
     min: 0,
     default: null
-  },
-  bidIncrement: {
-    type: Number,
-    min: 0.01,
-    default: 1.00
-  },
-  auctionType: {
-    type: String,
-    enum: ['pure_sale', 'reserve_price', 'buy_it_now', 'timed_auction', 'dutch_auction'],
-    default: 'pure_sale'
   },
   currency: {
     type: String,
@@ -78,15 +63,6 @@ const auctionSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  sellerAgreement: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'SellerAgreement',
-    default: null
-  },
-  isSellerAgreementComplete: {
-    type: Boolean,
-    default: false
-  },
   startTime: {
     type: Date,
     default: Date.now
@@ -95,25 +71,10 @@ const auctionSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  category: {
-    type: String,
-    trim: true,
-    maxlength: 50
-  },
-  condition: {
-    type: String,
-    enum: ['new', 'like-new', 'good', 'fair', 'poor'],
-    default: 'good'
-  },
-  tags: [{
-    type: String,
-    trim: true,
-    maxlength: 30
-  }],
   status: {
     type: String,
-    enum: ['draft', 'pending_agreement', 'active', 'ended', 'cancelled', 'sold'],
-    default: 'draft'
+    enum: ['draft', 'active', 'ended', 'cancelled', 'sold'],
+    default: 'active'
   },
   winner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -151,11 +112,6 @@ auctionSchema.methods.isReserveMet = function() {
 // Check if Buy It Now is available
 auctionSchema.methods.canBuyItNow = function() {
   return this.isActive() && this.buyItNowPrice && this.buyItNowPrice > 0;
-};
-
-// Check if auction can go live
-auctionSchema.methods.canGoLive = function() {
-  return this.isSellerAgreementComplete && this.status === 'pending_agreement';
 };
 
 // Update auction status based on end time and reserve
