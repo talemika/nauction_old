@@ -10,8 +10,6 @@ import { Alert, AlertDescription } from './ui/alert';
 import { Badge } from './ui/badge';
 import { Separator } from './ui/separator';
 import { Clock, DollarSign, User, Gavel, Loader2 } from 'lucide-react';
-import MaxBid from './MaxBid';
-import WatchlistButton from './WatchlistButton';
 import { api, bidsAPI } from '../lib/api';
 import { auctionsAPI } from '../lib/api';
 
@@ -434,12 +432,6 @@ const AuctionDetail = () => {
               </CardContent>
             </Card>
           )}
-
-          {/* Auto-Bidding Component */}
-          <MaxBid auction={auction} />
-
-          {/* Watchlist Button */}
-          <WatchlistButton auction={auction} className="w-full" />
         </div>
       </div>
     </div>
