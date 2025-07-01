@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
       await auction.updateStatus();
     }
 
-    res.json(auctions);
+    res.json({ auctions });
   } catch (error) {
     console.error('Error fetching auctions:', error);
     res.status(500).json({ message: 'Server error' });

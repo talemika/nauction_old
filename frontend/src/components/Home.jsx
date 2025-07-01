@@ -87,7 +87,9 @@ const Home = () => {
                 <div className="relative">
                   {auction.media && auction.media.length > 0 ? (
                     <img 
-                      src={`http://localhost:5000${auction.media[0].url}`}
+                      src={`${process.env.NODE_ENV === 'production' 
+                        ? 'https://5000-ikh7t640hxicw0sx0ks08-287ac3c4.manusvm.computer' 
+                        : 'http://localhost:5000'}${auction.media[0].url}`}
                       alt={auction.title}
                       className="w-full h-48 object-cover"
                     />
