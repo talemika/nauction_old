@@ -34,6 +34,11 @@ const auctionSchema = new mongoose.Schema({
     min: 0,
     default: null
   },
+  bidIncrement: {
+    type: Number,
+    min: 0.01,
+    default: 1.00
+  },
   currency: {
     type: String,
     enum: ['NGN', 'USD'],
@@ -100,9 +105,6 @@ auctionSchema.methods.isActive = function() {
 
 // Check if reserve price is met
 auctionSchema.methods.isReserveMet = function() {
-  if (this.auctionType === 'pure_sale') {
-    return true; // Pure sale items always "meet reserve"
-  }
   if (!this.reservePrice) {
     return true; // No reserve price set
   }
@@ -117,12 +119,8 @@ auctionSchema.methods.canBuyItNow = function() {
 // Update auction status based on end time and reserve
 auctionSchema.methods.updateStatus = function() {
   if (this.status === 'active' && new Date() >= this.endTime) {
-    if (this.auctionType === 'reserve_price' && !this.isReserveMet()) {
-      this.status = 'ended'; // Reserve not met, auction ends without sale
-    } else {
-      this.status = 'ended'; // Will be marked as sold if there's a winner
-      this.reserveMet = this.isReserveMet();
-    }
+    this.status = 'ended'; // Will be marked as sold if there's a winner
+    this.reserveMet = this.isReserveMet();
   }
   return this.save();
 };

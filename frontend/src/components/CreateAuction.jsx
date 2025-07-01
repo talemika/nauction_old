@@ -17,16 +17,11 @@ const CreateAuction = () => {
     startingPrice: '',
     buyItNowPrice: '',
     reservePrice: '',
-    estimatedRetailValue: '',
     bidIncrement: '1.00',
-    auctionType: 'pure_sale',
-    currency: 'NGN', // Default to Naira
-    category: '',
-    condition: 'good',
-    tags: '',
+    currency: 'NGN',
     startTime: '',
     endTime: '',
-    duration: '24', // hours (fallback if no specific end time)
+    duration: '24',
   });
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploadedMedia, setUploadedMedia] = useState([]);
@@ -49,7 +44,7 @@ const CreateAuction = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
 
@@ -75,22 +70,19 @@ const CreateAuction = () => {
           },
         });
 
-        if (response.data.file) {
-          uploadedFiles.push({
-            url: response.data.file.url,
-            type: file.type.startsWith('image/') ? 'image' : 'video',
-            filename: response.data.file.filename,
-            originalName: response.data.file.originalName
-          });
-        }
+        uploadedFiles.push({
+          url: response.data.file.url,
+          type: file.type.startsWith('image/') ? 'image' : 'video',
+          filename: response.data.file.filename,
+          originalName: response.data.file.originalName,
+        });
       }
 
       setUploadedMedia(uploadedFiles);
       return uploadedFiles;
-    } catch (error) {
-      console.error('Upload error:', error);
-      setError('Failed to upload files. Please try again.');
-      return [];
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to upload files');
+      return null;
     } finally {
       setUploading(false);
     }
@@ -98,67 +90,41 @@ const CreateAuction = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+    setLoading(true);
 
     try {
-      // Validate form data
+      // Validation
+      if (!formData.title || !formData.description || !formData.startingPrice) {
+        setError('Please fill in all required fields');
+        return;
+      }
+
       if (parseFloat(formData.startingPrice) <= 0) {
         setError('Starting price must be greater than 0');
-        setLoading(false);
         return;
       }
 
-      // Validate Buy It Now price
       if (formData.buyItNowPrice && parseFloat(formData.buyItNowPrice) <= parseFloat(formData.startingPrice)) {
         setError('Buy It Now price must be higher than starting price');
-        setLoading(false);
         return;
       }
 
-      // Validate reserve price
       if (formData.reservePrice && parseFloat(formData.reservePrice) < parseFloat(formData.startingPrice)) {
         setError('Reserve price cannot be lower than starting price');
-        setLoading(false);
         return;
       }
 
-      // Validate estimated retail value
-      if (formData.estimatedRetailValue && parseFloat(formData.estimatedRetailValue) <= 0) {
-        setError('Estimated retail value must be greater than 0');
-        setLoading(false);
+      if (parseFloat(formData.bidIncrement) <= 0) {
+        setError('Bid increment must be greater than 0');
         return;
       }
 
-      // Validate dates
-      const now = new Date();
-      const startTime = formData.startTime ? new Date(formData.startTime) : now;
-      const endTime = formData.endTime ? new Date(formData.endTime) : null;
-
-      if (formData.startTime && startTime < now) {
-        setError('Start time cannot be in the past');
-        setLoading(false);
-        return;
-      }
-
-      if (endTime && endTime <= startTime) {
-        setError('End time must be after start time');
-        setLoading(false);
-        return;
-      }
-
-      if (!endTime && (!formData.duration || parseInt(formData.duration) <= 0)) {
-        setError('Please specify either an end time or duration');
-        setLoading(false);
-        return;
-      }
-
-      // Upload files first if any are selected
+      // Upload files if any
       let mediaData = uploadedMedia;
       if (selectedFiles.length > 0 && uploadedMedia.length === 0) {
         mediaData = await uploadFiles();
-        if (mediaData.length === 0 && selectedFiles.length > 0) {
-          setLoading(false);
+        if (!mediaData) {
           return; // Upload failed, error already set
         }
       }
@@ -169,13 +135,8 @@ const CreateAuction = () => {
         startingPrice: parseFloat(formData.startingPrice),
         buyItNowPrice: formData.buyItNowPrice ? parseFloat(formData.buyItNowPrice) : null,
         reservePrice: formData.reservePrice ? parseFloat(formData.reservePrice) : null,
-        estimatedRetailValue: formData.estimatedRetailValue ? parseFloat(formData.estimatedRetailValue) : null,
         bidIncrement: parseFloat(formData.bidIncrement),
-        auctionType: formData.auctionType,
         currency: formData.currency,
-        category: formData.category,
-        condition: formData.condition,
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
         startTime: formData.startTime || undefined,
         endTime: formData.endTime || undefined,
         duration: formData.endTime ? undefined : parseInt(formData.duration),
@@ -198,273 +159,159 @@ const CreateAuction = () => {
   }
 
   if (user && user.role !== 'admin') {
-    return null; // Will redirect to home
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Card>
+          <CardContent className="text-center py-8">
+            <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
+            <p className="text-muted-foreground">Only administrators can create auctions.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="container mx-auto px-4 py-8">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Plus className="h-5 w-5" />
-            <span>Create New Auction</span>
-          </CardTitle>
+          <CardTitle>Create New Auction</CardTitle>
         </CardHeader>
-        
         <CardContent>
+          {error && (
+            <Alert className="mb-6">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            <div className="space-y-2">
-              <Label htmlFor="title">Title *</Label>
-              <Input
-                id="title"
-                name="title"
-                type="text"
-                placeholder="Enter auction title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                maxLength={100}
-              />
-              <p className="text-sm text-muted-foreground">
-                {formData.title.length}/100 characters
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description">Description *</Label>
-              <Textarea
-                id="description"
-                name="description"
-                placeholder="Describe your item in detail..."
-                value={formData.description}
-                onChange={handleChange}
-                required
-                maxLength={1000}
-                rows={5}
-              />
-              <p className="text-sm text-muted-foreground">
-                {formData.description.length}/1000 characters
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="startingPrice">
-                  Starting Price ({formData.currency === 'NGN' ? '₦' : '$'}) *
-                </Label>
-                <Input
-                  id="startingPrice"
-                  name="startingPrice"
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  placeholder="0.00"
-                  value={formData.startingPrice}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="currency">Currency *</Label>
-                <select
-                  id="currency"
-                  name="currency"
-                  value={formData.currency}
-                  onChange={handleChange}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  required
-                >
-                  <option value="NGN">₦ Nigerian Naira (NGN)</option>
-                  <option value="USD">$ US Dollar (USD)</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="duration">Duration (hours) *</Label>
-                <Input
-                  id="duration"
-                  name="duration"
-                  type="number"
-                  min="1"
-                  max="168" // 1 week
-                  placeholder="24"
-                  value={formData.duration}
-                  onChange={handleChange}
-                  required
-                />
-                <p className="text-sm text-muted-foreground">
-                  Maximum 168 hours (1 week)
-                </p>
-              </div>
-            </div>
-
-            {/* Auction Type and Pricing Options */}
+            {/* Basic Information */}
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="auctionType">Auction Type *</Label>
-                <select
-                  id="auctionType"
-                  name="auctionType"
-                  value={formData.auctionType}
-                  onChange={handleChange}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              <h3 className="text-lg font-semibold">Basic Information</h3>
+              
+              <div>
+                <Label htmlFor="title">Title *</Label>
+                <Input
+                  id="title"
+                  name="title"
+                  type="text"
                   required
-                >
-                  <option value="pure_sale">Pure Sale (Always sells to highest bidder)</option>
-                  <option value="reserve_price">Reserve Price (Must meet minimum to sell)</option>
-                </select>
-                <p className="text-sm text-muted-foreground">
-                  Pure sale items automatically sell at final bid price. Reserve price items only sell if reserve is met.
-                </p>
+                  maxLength={100}
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder="Enter auction title"
+                />
               </div>
 
+              <div>
+                <Label htmlFor="description">Description *</Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  required
+                  maxLength={1000}
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Describe the item being auctioned"
+                  rows={4}
+                />
+              </div>
+            </div>
+
+            {/* Pricing */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Pricing</h3>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="buyItNowPrice">
-                    Buy It Now Price ({formData.currency === 'NGN' ? '₦' : '$'}) (Optional)
-                  </Label>
+                <div>
+                  <Label htmlFor="startingPrice">Starting Price *</Label>
+                  <Input
+                    id="startingPrice"
+                    name="startingPrice"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    required
+                    value={formData.startingPrice}
+                    onChange={handleChange}
+                    placeholder="0.00"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="currency">Currency *</Label>
+                  <select
+                    id="currency"
+                    name="currency"
+                    value={formData.currency}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-input bg-background rounded-md"
+                  >
+                    <option value="NGN">Nigerian Naira (NGN)</option>
+                    <option value="USD">US Dollar (USD)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <Label htmlFor="buyItNowPrice">Buy It Now Price (optional)</Label>
                   <Input
                     id="buyItNowPrice"
                     name="buyItNowPrice"
                     type="number"
                     step="0.01"
-                    min="0.01"
-                    placeholder="0.00"
+                    min="0"
                     value={formData.buyItNowPrice}
                     onChange={handleChange}
+                    placeholder="0.00"
                   />
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Allow buyers to purchase immediately at this price
                   </p>
                 </div>
 
-                {formData.auctionType === 'reserve_price' && (
-                  <div className="space-y-2">
-                    <Label htmlFor="reservePrice">
-                      Reserve Price ({formData.currency === 'NGN' ? '₦' : '$'}) (Optional)
-                    </Label>
-                    <Input
-                      id="reservePrice"
-                      name="reservePrice"
-                      type="number"
-                      step="0.01"
-                      min="0.01"
-                      placeholder="0.00"
-                      value={formData.reservePrice}
-                      onChange={handleChange}
-                    />
-                    <p className="text-sm text-muted-foreground">
-                      Minimum price required for the item to sell
-                    </p>
-                  </div>
-                )}
-              </div>
+                <div>
+                  <Label htmlFor="reservePrice">Reserve Price (optional)</Label>
+                  <Input
+                    id="reservePrice"
+                    name="reservePrice"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.reservePrice}
+                    onChange={handleChange}
+                    placeholder="0.00"
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Minimum price you'll accept for this item
+                  </p>
+                </div>
 
-              {/* Estimated Retail Value */}
-              <div className="space-y-2">
-                <Label htmlFor="estimatedRetailValue">
-                  Estimated Retail Value ({formData.currency === 'NGN' ? '₦' : '$'}) (Optional)
-                </Label>
-                <Input
-                  id="estimatedRetailValue"
-                  name="estimatedRetailValue"
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  placeholder="0.00"
-                  value={formData.estimatedRetailValue}
-                  onChange={handleChange}
-                />
-                <p className="text-sm text-muted-foreground">
-                  Estimated market value to help bidders understand the item's worth
-                </p>
-              </div>
-
-              {/* Bid Increment */}
-              <div className="space-y-2">
-                <Label htmlFor="bidIncrement">
-                  Bid Increment ({formData.currency === 'NGN' ? '₦' : '$'}) *
-                </Label>
-                <Input
-                  id="bidIncrement"
-                  name="bidIncrement"
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  placeholder="1.00"
-                  value={formData.bidIncrement}
-                  onChange={handleChange}
-                  required
-                />
-                <p className="text-sm text-muted-foreground">
-                  Minimum amount by which bids must increase
-                </p>
+                <div>
+                  <Label htmlFor="bidIncrement">Bid Increment *</Label>
+                  <Input
+                    id="bidIncrement"
+                    name="bidIncrement"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    required
+                    value={formData.bidIncrement}
+                    onChange={handleChange}
+                    placeholder="1.00"
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Minimum amount each bid must increase
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Category and Condition */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                <Input
-                  id="category"
-                  name="category"
-                  type="text"
-                  placeholder="e.g., Electronics, Clothing, Art"
-                  value={formData.category}
-                  onChange={handleChange}
-                  maxLength={50}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="condition">Condition *</Label>
-                <select
-                  id="condition"
-                  name="condition"
-                  value={formData.condition}
-                  onChange={handleChange}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  required
-                >
-                  <option value="new">New</option>
-                  <option value="like-new">Like New</option>
-                  <option value="good">Good</option>
-                  <option value="fair">Fair</option>
-                  <option value="poor">Poor</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Tags */}
-            <div className="space-y-2">
-              <Label htmlFor="tags">Tags (optional)</Label>
-              <Input
-                id="tags"
-                name="tags"
-                type="text"
-                placeholder="Enter tags separated by commas (e.g., vintage, rare, collectible)"
-                value={formData.tags}
-                onChange={handleChange}
-              />
-              <p className="text-sm text-muted-foreground">
-                Separate multiple tags with commas to help users find your auction
-              </p>
-            </div>
-
-            {/* Auction Scheduling */}
+            {/* Timing */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium">Auction Scheduling</h3>
+              <h3 className="text-lg font-semibold">Auction Timing</h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
                   <Label htmlFor="startTime">Start Time (optional)</Label>
                   <Input
                     id="startTime"
@@ -472,14 +319,13 @@ const CreateAuction = () => {
                     type="datetime-local"
                     value={formData.startTime}
                     onChange={handleChange}
-                    min={new Date().toISOString().slice(0, 16)}
                   />
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Leave empty to start immediately
                   </p>
                 </div>
 
-                <div className="space-y-2">
+                <div>
                   <Label htmlFor="endTime">End Time (optional)</Label>
                   <Input
                     id="endTime"
@@ -487,98 +333,95 @@ const CreateAuction = () => {
                     type="datetime-local"
                     value={formData.endTime}
                     onChange={handleChange}
-                    min={formData.startTime || new Date().toISOString().slice(0, 16)}
                   />
-                  <p className="text-sm text-muted-foreground">
-                    Leave empty to use duration instead
-                  </p>
                 </div>
-              </div>
 
-              {!formData.endTime && (
-                <div className="space-y-2">
-                  <Label htmlFor="duration">Duration (hours) *</Label>
+                <div>
+                  <Label htmlFor="duration">Duration (hours)</Label>
                   <Input
                     id="duration"
                     name="duration"
                     type="number"
                     min="1"
-                    max="168" // 1 week
-                    placeholder="24"
                     value={formData.duration}
                     onChange={handleChange}
-                    required={!formData.endTime}
+                    placeholder="24"
                   />
-                  <p className="text-sm text-muted-foreground">
-                    Maximum 168 hours (1 week). Only used if no end time is specified.
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Used if no end time specified
                   </p>
                 </div>
-              )}
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="media">Media Files (optional)</Label>
-              <Input
-                id="media"
-                name="media"
-                type="file"
-                multiple
-                accept="image/*,video/*"
-                onChange={handleFileSelect}
-                className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/80"
-              />
-              <p className="text-sm text-muted-foreground">
-                Upload images or videos of your item (max 50MB per file)
-              </p>
+            {/* Media Upload */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Media</h3>
+              
+              <div>
+                <Label htmlFor="media">Upload Images/Videos</Label>
+                <Input
+                  id="media"
+                  type="file"
+                  multiple
+                  accept="image/*,video/*"
+                  onChange={handleFileSelect}
+                  className="cursor-pointer"
+                />
+                <p className="text-sm text-muted-foreground mt-1">
+                  Select multiple images or videos to showcase your item
+                </p>
+              </div>
+
               {selectedFiles.length > 0 && (
-                <div className="mt-2">
+                <div>
                   <p className="text-sm font-medium">Selected files:</p>
                   <ul className="text-sm text-muted-foreground">
                     {selectedFiles.map((file, index) => (
-                      <li key={index}>{file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)</li>
+                      <li key={index}>{file.name}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {uploadedMedia.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium text-green-600">Uploaded files:</p>
+                  <ul className="text-sm text-muted-foreground">
+                    {uploadedMedia.map((media, index) => (
+                      <li key={index}>{media.originalName}</li>
                     ))}
                   </ul>
                 </div>
               )}
             </div>
 
-            {/* Media Preview */}
-            {uploadedMedia.length > 0 && (
-              <div className="space-y-2">
-                <Label>Media Preview</Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {uploadedMedia.map((media, index) => (
-                    <div key={index} className="w-full h-48 bg-muted rounded-md overflow-hidden">
-                      {media.type === 'image' ? (
-                        <img 
-                          src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${media.url}`}
-                          alt={media.originalName}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <video 
-                          src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${media.url}`}
-                          className="w-full h-full object-cover"
-                          controls
-                        />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="flex space-x-4">
+            {/* Submit Button */}
+            <div className="flex gap-4">
               <Button type="submit" className="flex-1" disabled={loading || uploading}>
-                {(loading || uploading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {uploading ? 'Uploading Files...' : loading ? 'Creating Auction...' : 'Create Auction'}
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating Auction...
+                  </>
+                ) : uploading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Uploading Files...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create Auction
+                  </>
+                )}
               </Button>
               
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={() => navigate('/')}
-                disabled={loading}
+                disabled={loading || uploading}
               >
                 Cancel
               </Button>
