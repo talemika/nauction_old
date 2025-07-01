@@ -13,17 +13,21 @@ const MyAuctions = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if not authenticated
+  // Redirect if not authenticated or not admin
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
+    if (user && user.role !== 'admin') {
+      navigate('/');
+      return;
+    }
     fetchMyAuctions();
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   const fetchMyAuctions = async () => {
     try {
@@ -98,12 +102,14 @@ const MyAuctions = () => {
           <h1 className="text-3xl font-bold">My Auctions</h1>
           <p className="text-muted-foreground">Manage your auction listings</p>
         </div>
-        <Button asChild>
-          <Link to="/create-auction" className="flex items-center space-x-2">
-            <Plus className="h-4 w-4" />
-            <span>Create New Auction</span>
-          </Link>
-        </Button>
+        {user?.role === 'admin' && (
+          <Button asChild>
+            <Link to="/create-auction" className="flex items-center space-x-2">
+              <Plus className="h-4 w-4" />
+              <span>Create New Auction</span>
+            </Link>
+          </Button>
+        )}
       </div>
 
       {error && (
@@ -119,9 +125,11 @@ const MyAuctions = () => {
           <p className="text-muted-foreground mt-2 mb-4">
             Start by creating your first auction
           </p>
-          <Button asChild>
-            <Link to="/create-auction">Create Auction</Link>
-          </Button>
+          {user?.role === 'admin' && (
+            <Button asChild>
+              <Link to="/create-auction">Create Auction</Link>
+            </Button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

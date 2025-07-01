@@ -36,22 +36,20 @@ const Navbar = () => {
             {isAuthenticated && (
               <>
                 {user?.role === 'admin' && (
-                  <Link to="/create-auction" className="flex items-center space-x-1 text-foreground hover:text-primary transition-colors">
-                    <Plus className="h-4 w-4" />
-                    <span>Create Auction</span>
-                  </Link>
+                  <>
+                    <Link to="/create-auction" className="flex items-center space-x-1 text-foreground hover:text-primary transition-colors">
+                      <Plus className="h-4 w-4" />
+                      <span>Create Auction</span>
+                    </Link>
+                    <Link to="/my-auctions" className="flex items-center space-x-1 text-foreground hover:text-primary transition-colors">
+                      <List className="h-4 w-4" />
+                      <span>My Auctions</span>
+                    </Link>
+                  </>
                 )}
-                <Link to="/my-auctions" className="flex items-center space-x-1 text-foreground hover:text-primary transition-colors">
-                  <List className="h-4 w-4" />
-                  <span>My Auctions</span>
-                </Link>
                 <Link to="/my-bids" className="flex items-center space-x-1 text-foreground hover:text-primary transition-colors">
                   <TrendingUp className="h-4 w-4" />
                   <span>My Bids</span>
-                </Link>
-                <Link to="/watchlist" className="flex items-center space-x-1 text-foreground hover:text-primary transition-colors">
-                  <Heart className="h-4 w-4" />
-                  <span>Watchlist</span>
                 </Link>
               </>
             )}
