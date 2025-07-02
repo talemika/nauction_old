@@ -24,6 +24,7 @@ const AuctionDetail = () => {
   const [loading, setLoading] = useState(true);
   const [bidAmount, setBidAmount] = useState('');
   const [bidLoading, setBidLoading] = useState(false);
+  const [autoRefreshing, setAutoRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -67,6 +68,9 @@ const AuctionDetail = () => {
         return;
       }
 
+      // Store the current price before placing bid to detect auto-bid changes
+      const preBidPrice = auction.currentPrice;
+
       await bidsAPI.placeBid({
         auctionId: auction._id,
         amount: amount,
@@ -75,8 +79,46 @@ const AuctionDetail = () => {
       setSuccess('Bid placed successfully!');
       setBidAmount('');
       
-      // Refresh auction details
+      // Refresh auction details immediately
       await fetchAuctionDetails();
+
+      // Auto-refresh to catch auto-bids with progressive delays
+      // This ensures users see auto-bids that may be triggered after their manual bid
+      const refreshForAutoBids = async () => {
+        setAutoRefreshing(true);
+        const delays = [1000, 2000, 3000]; // 1s, 2s, 3s delays
+        let lastKnownPrice = preBidPrice;
+        
+        for (const delay of delays) {
+          await new Promise(resolve => setTimeout(resolve, delay));
+          
+          try {
+            const response = await auctionsAPI.getById(auction._id);
+            const updatedAuction = response.data.auction;
+            
+            // If the price changed from what we last knew, update the display
+            if (updatedAuction.currentPrice !== lastKnownPrice) {
+              setAuction(updatedAuction);
+              setBids(response.data.bids || []);
+              lastKnownPrice = updatedAuction.currentPrice;
+              
+              // Show notification about auto-bid activity
+              if (updatedAuction.currentPrice > amount) {
+                setSuccess('Bid placed successfully! Auto-bidding activity detected - current price updated.');
+              }
+            }
+          } catch (error) {
+            console.error('Error refreshing auction for auto-bids:', error);
+            // Don't show error to user as this is background refresh
+          }
+        }
+        
+        setAutoRefreshing(false);
+      };
+
+      // Start auto-refresh process in background
+      refreshForAutoBids();
+      
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to place bid');
     } finally {
@@ -341,6 +383,12 @@ const AuctionDetail = () => {
                 <div className="text-3xl font-bold text-green-600">
                   {formatPrice(auction.currentPrice)}
                 </div>
+                {autoRefreshing && (
+                  <div className="flex items-center justify-center space-x-1 text-blue-500">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <span className="text-xs">Checking for auto-bids...</span>
+                  </div>
+                )}
               </div>
 
               <Separator />
