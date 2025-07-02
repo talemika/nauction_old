@@ -6,20 +6,76 @@ const { requireAdminAuth } = require('../middleware/adminAuth');
 
 const router = express.Router();
 
-// Get all active auctions
+// Get all active auctions with search and filter support
 router.get('/', async (req, res) => {
   try {
-    const auctions = await Auction.find({ status: 'active' })
+    const {
+      search,
+      minPrice,
+      maxPrice,
+      currency,
+      sortBy = 'createdAt',
+      sortOrder = 'desc'
+    } = req.query;
+
+    // Build the query object
+    let query = { status: 'active' };
+
+    // Add search functionality
+    if (search && search.trim()) {
+      query.$or = [
+        { title: { $regex: search.trim(), $options: 'i' } },
+        { description: { $regex: search.trim(), $options: 'i' } }
+      ];
+    }
+
+    // Add price range filtering
+    if (minPrice || maxPrice) {
+      query.startingPrice = {};
+      if (minPrice) {
+        query.startingPrice.$gte = parseFloat(minPrice);
+      }
+      if (maxPrice) {
+        query.startingPrice.$lte = parseFloat(maxPrice);
+      }
+    }
+
+    // Add currency filtering
+    if (currency && ['NGN', 'USD'].includes(currency)) {
+      query.currency = currency;
+    }
+
+    // Build sort object
+    let sortObj = {};
+    const validSortFields = ['createdAt', 'startingPrice', 'currentPrice', 'endTime', 'title'];
+    if (validSortFields.includes(sortBy)) {
+      sortObj[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    } else {
+      sortObj.createdAt = -1; // Default sort
+    }
+
+    const auctions = await Auction.find(query)
       .populate('seller', 'username')
       .populate('winner', 'username')
-      .sort({ createdAt: -1 });
+      .sort(sortObj);
 
     // Update auction statuses
     for (let auction of auctions) {
       await auction.updateStatus();
     }
 
-    res.json({ auctions });
+    res.json({ 
+      auctions,
+      total: auctions.length,
+      filters: {
+        search: search || '',
+        minPrice: minPrice || '',
+        maxPrice: maxPrice || '',
+        currency: currency || '',
+        sortBy,
+        sortOrder
+      }
+    });
   } catch (error) {
     console.error('Error fetching auctions:', error);
     res.status(500).json({ message: 'Server error' });

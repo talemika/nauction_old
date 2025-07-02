@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useCurrency } from '../hooks/useCurrency';
@@ -6,29 +6,48 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Clock, DollarSign, User } from 'lucide-react';
+import SearchComponent from './SearchComponent';
 
 const Home = () => {
   const [auctions, setAuctions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchFilters, setSearchFilters] = useState({});
+  const [totalResults, setTotalResults] = useState(0);
   const { displayAmount } = useCurrency();
 
-  useEffect(() => {
-    fetchAuctions();
-  }, []);
-
-  const fetchAuctions = async () => {
+  const fetchAuctions = useCallback(async (filters = {}) => {
     try {
       setLoading(true);
-      const response = await api.get('/auctions');
+      setError(null);
+      
+      // Build query parameters
+      const params = new URLSearchParams();
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value && value !== '') {
+          params.append(key, value);
+        }
+      });
+
+      const response = await api.get(`/auctions?${params.toString()}`);
       setAuctions(response.data.auctions || []);
+      setTotalResults(response.data.total || 0);
+      setSearchFilters(filters);
     } catch (err) {
       setError('Failed to fetch auctions');
       console.error('Error fetching auctions:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchAuctions();
+  }, [fetchAuctions]);
+
+  const handleSearch = useCallback((filters) => {
+    fetchAuctions(filters);
+  }, [fetchAuctions]);
 
   const formatTimeRemaining = (endTime) => {
     const now = new Date();
@@ -72,13 +91,34 @@ const Home = () => {
         </p>
       </div>
 
+      {/* Search Component */}
+      <SearchComponent onSearch={handleSearch} initialFilters={searchFilters} />
+
+      {/* Results Summary */}
+      {(searchFilters.search || Object.keys(searchFilters).some(key => searchFilters[key] && key !== 'sortBy' && key !== 'sortOrder')) && (
+        <div className="text-sm text-muted-foreground">
+          {loading ? 'Searching...' : `Found ${totalResults} auction${totalResults !== 1 ? 's' : ''}`}
+          {searchFilters.search && ` for "${searchFilters.search}"`}
+        </div>
+      )}
+
       {/* Active Auctions */}
       <div>
-        <h2 className="text-2xl font-semibold mb-6">Active Auctions</h2>
+        <h2 className="text-2xl font-semibold mb-6">
+          {searchFilters.search || Object.keys(searchFilters).some(key => searchFilters[key] && key !== 'sortBy' && key !== 'sortOrder') 
+            ? 'Search Results' 
+            : 'Active Auctions'
+          }
+        </h2>
         
         {auctions.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">No active auctions at the moment.</p>
+            <p className="text-muted-foreground">
+              {searchFilters.search || Object.keys(searchFilters).some(key => searchFilters[key] && key !== 'sortBy' && key !== 'sortOrder')
+                ? 'No auctions found matching your search criteria.'
+                : 'No active auctions at the moment.'
+              }
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
