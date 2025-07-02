@@ -12,6 +12,8 @@ const SearchComponent = ({ onSearch, initialFilters = {} }) => {
     minPrice: '',
     maxPrice: '',
     currency: '',
+    hasReserve: '',
+    hasBuyItNow: '',
     sortBy: 'createdAt',
     sortOrder: 'desc',
     ...initialFilters
@@ -37,6 +39,8 @@ const SearchComponent = ({ onSearch, initialFilters = {} }) => {
       minPrice: '',
       maxPrice: '',
       currency: '',
+      hasReserve: '',
+      hasBuyItNow: '',
       sortBy: 'createdAt',
       sortOrder: 'desc'
     };
@@ -132,6 +136,40 @@ const SearchComponent = ({ onSearch, initialFilters = {} }) => {
               </div>
             </div>
 
+            {/* Auction Type Filters */}
+            <div>
+              <Label className="text-sm font-medium mb-2 block">Auction Type</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Reserve Price Filter */}
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">Reserve Price</Label>
+                  <select
+                    value={filters.hasReserve}
+                    onChange={(e) => handleInputChange('hasReserve', e.target.value)}
+                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
+                  >
+                    <option value="">All Items</option>
+                    <option value="true">Has Reserve Price</option>
+                    <option value="false">No Reserve (Pure Sale)</option>
+                  </select>
+                </div>
+
+                {/* Buy It Now Filter */}
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">Buy It Now</Label>
+                  <select
+                    value={filters.hasBuyItNow}
+                    onChange={(e) => handleInputChange('hasBuyItNow', e.target.value)}
+                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
+                  >
+                    <option value="">All Items</option>
+                    <option value="true">Has Buy It Now</option>
+                    <option value="false">Auction Only</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
             {/* Currency and Sort */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Currency Filter */}
@@ -179,7 +217,7 @@ const SearchComponent = ({ onSearch, initialFilters = {} }) => {
             </div>
 
             {/* Active Filters Display */}
-            {(filters.search || filters.minPrice || filters.maxPrice || filters.currency) && (
+            {(filters.search || filters.minPrice || filters.maxPrice || filters.currency || filters.hasReserve || filters.hasBuyItNow) && (
               <div className="pt-2">
                 <Label className="text-sm font-medium mb-2 block">Active Filters:</Label>
                 <div className="flex flex-wrap gap-2">
@@ -222,6 +260,28 @@ const SearchComponent = ({ onSearch, initialFilters = {} }) => {
                       <button
                         onClick={() => handleInputChange('currency', '')}
                         className="ml-1 hover:text-purple-600"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  )}
+                  {filters.hasReserve && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-orange-100 text-orange-800">
+                      Reserve: {filters.hasReserve === 'true' ? 'Has Reserve' : 'No Reserve'}
+                      <button
+                        onClick={() => handleInputChange('hasReserve', '')}
+                        className="ml-1 hover:text-orange-600"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  )}
+                  {filters.hasBuyItNow && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-indigo-100 text-indigo-800">
+                      Buy It Now: {filters.hasBuyItNow === 'true' ? 'Available' : 'Not Available'}
+                      <button
+                        onClick={() => handleInputChange('hasBuyItNow', '')}
+                        className="ml-1 hover:text-indigo-600"
                       >
                         <X className="h-3 w-3" />
                       </button>

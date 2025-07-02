@@ -14,6 +14,8 @@ router.get('/', async (req, res) => {
       minPrice,
       maxPrice,
       currency,
+      hasReserve,
+      hasBuyItNow,
       sortBy = 'createdAt',
       sortOrder = 'desc'
     } = req.query;
@@ -45,6 +47,32 @@ router.get('/', async (req, res) => {
       query.currency = currency;
     }
 
+    // Add reserve price filtering
+    if (hasReserve !== undefined && hasReserve !== '') {
+      if (hasReserve === 'true') {
+        query.reservePrice = { $exists: true, $ne: null, $gt: 0 };
+      } else if (hasReserve === 'false') {
+        query.$or = [
+          { reservePrice: { $exists: false } },
+          { reservePrice: null },
+          { reservePrice: 0 }
+        ];
+      }
+    }
+
+    // Add buy it now filtering
+    if (hasBuyItNow !== undefined && hasBuyItNow !== '') {
+      if (hasBuyItNow === 'true') {
+        query.buyItNowPrice = { $exists: true, $ne: null, $gt: 0 };
+      } else if (hasBuyItNow === 'false') {
+        query.$or = [
+          { buyItNowPrice: { $exists: false } },
+          { buyItNowPrice: null },
+          { buyItNowPrice: 0 }
+        ];
+      }
+    }
+
     // Build sort object
     let sortObj = {};
     const validSortFields = ['createdAt', 'startingPrice', 'currentPrice', 'endTime', 'title'];
@@ -72,6 +100,8 @@ router.get('/', async (req, res) => {
         minPrice: minPrice || '',
         maxPrice: maxPrice || '',
         currency: currency || '',
+        hasReserve: hasReserve || '',
+        hasBuyItNow: hasBuyItNow || '',
         sortBy,
         sortOrder
       }
