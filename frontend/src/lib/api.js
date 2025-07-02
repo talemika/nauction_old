@@ -48,6 +48,15 @@ export const bidsAPI = {
   getHighestBid: (auctionId) => api.get(`/bids/auction/${auctionId}/highest`),
 };
 
+// Max Bids API
+export const maxBidsAPI = {
+  setMaxBid: (maxBidData) => api.post('/maxbids', maxBidData),
+  getUserMaxBid: (auctionId) => api.get(`/maxbids/auction/${auctionId}`),
+  getAllMaxBids: (auctionId) => api.get(`/maxbids/auction/${auctionId}/all`),
+  cancelMaxBid: (maxBidId) => api.delete(`/maxbids/${maxBidId}`),
+  getUserActiveMaxBids: () => api.get('/maxbids/user/active'),
+};
+
 // Currency API
 export const currencyAPI = {
   getExchangeRates: () => api.get('/currency/rates'),

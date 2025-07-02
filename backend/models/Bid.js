@@ -29,6 +29,11 @@ const bidSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  maxBid: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'MaxBid',
+    default: null
+  },
   timestamp: {
     type: Date,
     default: Date.now

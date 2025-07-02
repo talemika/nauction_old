@@ -12,6 +12,7 @@ import { Separator } from './ui/separator';
 import { Clock, DollarSign, User, Gavel, Loader2 } from 'lucide-react';
 import { api, bidsAPI } from '../lib/api';
 import { auctionsAPI } from '../lib/api';
+import MaxBidComponent from './MaxBidComponent';
 
 const AuctionDetail = () => {
   const { id } = useParams();
@@ -432,6 +433,15 @@ const AuctionDetail = () => {
               </CardContent>
             </Card>
           )}
+
+          {/* Max Bid Component */}
+          <MaxBidComponent 
+            auction={auction} 
+            onMaxBidUpdate={(maxBid) => {
+              // Refresh auction details when max bid is updated
+              fetchAuctionDetails();
+            }} 
+          />
         </div>
       </div>
     </div>

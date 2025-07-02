@@ -11,6 +11,7 @@ import AuctionDetail from './components/AuctionDetail';
 import CreateAuction from './components/CreateAuction';
 import MyAuctions from './components/MyAuctions';
 import MyBids from './components/MyBids';
+import MyMaxBids from './components/MyMaxBids';
 import AdminPanel from './components/AdminPanel';
 import UserProfile from './components/UserProfile';
 import BiddingInfo from './components/BiddingInfo';
@@ -33,6 +34,7 @@ function App() {
                 <Route path="/create-auction" element={<CreateAuction />} />
                 <Route path="/my-auctions" element={<MyAuctions />} />
                 <Route path="/my-bids" element={<MyBids />} />
+                <Route path="/my-max-bids" element={<MyMaxBids />} />
                 <Route path="/admin" element={<AdminPanel />} />
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/bidding-info" element={<BiddingInfo />} />

@@ -58,6 +58,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/auth', require('./routes/oauth')); // Google OAuth routes
 app.use('/api/auctions', require('./routes/auctions'));
 app.use('/api/bids', require('./routes/bids'));
+app.use('/api/maxbids', require('./routes/maxBid'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/currency', require('./routes/currency'));
 app.use('/api/search', require('./routes/search'));
