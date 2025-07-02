@@ -76,7 +76,13 @@ app.get('/', (req, res) => {
   res.json({ message: 'nauction API is running!' });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// Only start the server if this file is run directly (not imported)
+if (require.main === module) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+// Export the app for Vercel
+module.exports = app;
 
