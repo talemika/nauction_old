@@ -21,7 +21,7 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 text-xl font-bold text-primary">
             <Gavel className="h-6 w-6" />
-            <span>Auction House</span>
+            <span>nauction</span>
           </Link>
 
           {/* Navigation Links */}

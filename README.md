@@ -1,4 +1,4 @@
-# MERN Stack Auction Application - Enhanced Edition
+# nauction - MERN Stack Auction Application
 
 A full-stack auction application built with MongoDB, Express.js, React, and Node.js, featuring **admin-only auction creation** and **file/video upload functionality**.
 
@@ -113,7 +113,7 @@ frontend/
 1. **Clone the repository**
 ```bash
 git clone <repository-url>
-cd auction-app
+cd nauction
 ```
 
 2. **Backend Setup**
@@ -126,7 +126,7 @@ npm install
 Create `.env` file in backend directory:
 ```env
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/auction-app
+MONGODB_URI=mongodb://localhost:27017/nauction
 JWT_SECRET=your-super-secret-jwt-key-change-in-production
 ```
 

@@ -40,7 +40,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // MongoDB connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/auction-app';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/nauction';
 
 mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
@@ -73,7 +73,7 @@ app.use('/api/auctions', buyItNowRouter);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get('/', (req, res) => {
-  res.json({ message: 'Auction App API is running!' });
+  res.json({ message: 'nauction API is running!' });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
