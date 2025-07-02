@@ -51,14 +51,8 @@ const SearchComponent = ({ onSearch, initialFilters = {} }) => {
     }
   };
 
-  // Auto-search when filters change (with debounce)
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      onSearch(filters);
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [filters, onSearch]);
+  // Remove auto-search to prevent infinite loops
+  // Users will need to click Search button or press Enter
 
   return (
     <Card className="mb-6">

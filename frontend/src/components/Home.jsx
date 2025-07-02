@@ -39,11 +39,11 @@ const Home = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, []); // Remove dependencies to prevent infinite loop
 
   useEffect(() => {
     fetchAuctions();
-  }, [fetchAuctions]);
+  }, []); // Only run on mount
 
   const handleSearch = useCallback((filters) => {
     fetchAuctions(filters);
