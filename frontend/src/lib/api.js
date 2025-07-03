@@ -1,9 +1,10 @@
 import axios from 'axios';
 
-// Use localhost for development, deployed URL for production
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://5000-ikh7t640hxicw0sx0ks08-287ac3c4.manusvm.computer/api'
-  : 'http://localhost:5000/api';
+// Use environment variable for API URL, with fallbacks
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
+  (import.meta.env.MODE === 'production' 
+    ? 'https://nauction-backend.vercel.app/api'
+    : 'http://localhost:5000/api');
 
 const api = axios.create({
   baseURL: API_BASE_URL,

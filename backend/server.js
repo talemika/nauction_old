@@ -16,7 +16,9 @@ app.use(cors({
     'http://localhost:3000',
     'http://localhost:5173',
     'http://localhost:5179',
-    'https://*.manus.space'
+    'https://*.manus.space',
+    'https://nauction-frontend.vercel.app',
+    'https://*.vercel.app'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
