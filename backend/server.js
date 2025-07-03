@@ -55,16 +55,16 @@ mongoose.connect(MONGODB_URI, {
 })
 .catch(err => console.error('MongoDB connection error:', err));
 
-// Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/auth', require('./routes/oauth')); // Google OAuth routes
-app.use('/api/auctions', require('./routes/auctions'));
-app.use('/api/bids', require('./routes/bids'));
-app.use('/api/maxbids', require('./routes/maxBid'));
-app.use('/api/upload', require('./routes/upload'));
-app.use('/api/currency', require('./routes/currency'));
-app.use('/api/search', require('./routes/search'));
-app.use('/api/users', require('./routes/users'));
+// Routes - Remove /api prefix since we're already in the /api directory in Vercel
+app.use('/auth', require('./routes/auth'));
+app.use('/oauth', require('./routes/oauth')); // Google OAuth routes
+app.use('/auctions', require('./routes/auctions'));
+app.use('/bids', require('./routes/bids'));
+app.use('/maxbids', require('./routes/maxBid'));
+app.use('/upload', require('./routes/upload'));
+app.use('/currency', require('./routes/currency'));
+app.use('/search', require('./routes/search'));
+app.use('/users', require('./routes/users'));
 
 // Add Buy It Now functionality to auctions route
 const auctionsRouter = require('./routes/auctions');
